@@ -63,8 +63,7 @@ elif 'test' in sys.argv:
 
 class Install(install):
     def finalize_options(self):
-        # NOTE: for Pardus distribution
-        if os.path.exists("/etc/pardus-release"):
+        if os.path.exists("/etc/sulin-release"):
             self.install_platlib = '$base/lib/sulin'
             self.install_purelib = '$base/lib/sulin'
         install.finalize_options(self)

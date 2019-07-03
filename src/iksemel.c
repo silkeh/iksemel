@@ -660,8 +660,7 @@ sax_core (iksparser *prs, char *buf, int len)
 					prs->context = C_ENTITY;
 					prs->entpos = 0;
 					break;
-				}
-				if ('<' == c) {
+				}else if ('<' == c) {
 					if (old < pos && prs->cdataHook) {
 						err = prs->cdataHook (prs->user_data, &buf[old], pos - old);
 						if (IKS_OK != err) return err;
@@ -678,12 +677,10 @@ sax_core (iksparser *prs, char *buf, int len)
 				if ('/' == c) {
 					prs->tagtype = IKS_CLOSE;
 					break;
-				}
-				if ('?' == c) {
+				}else if ('?' == c) {
 					prs->context = C_PI;
 					break;
-				}
-				if ('!' == c) {
+				}else if ('!' == c) {
 					prs->context = C_MARKUP;
 					break;
 				}
@@ -702,8 +699,7 @@ sax_core (iksparser *prs, char *buf, int len)
 					stack_old = -1;
 					STACK_PUSH_END;
 					break;
-				}
-				if ('/' == c) {
+				}else if ('/' == c) {
 					if (IKS_CLOSE == prs->tagtype) return IKS_BADXML;
 					prs->tagtype = IKS_SINGLE;
 					prs->context = C_TAG_END;
@@ -711,8 +707,7 @@ sax_core (iksparser *prs, char *buf, int len)
 					stack_old = -1;
 					STACK_PUSH_END;
 					break;
-				}
-				if ('>' == c) {
+				}else if ('>' == c) {
 					prs->context = C_TAG_END;
 					if (stack_old != -1) STACK_PUSH (buf + stack_old, pos - stack_old);
 					stack_old = -1;
@@ -744,8 +739,7 @@ sax_core (iksparser *prs, char *buf, int len)
 					prs->tagtype = IKS_SINGLE;
 					prs->context = C_TAG_END;
 					break;
-				}
-				if ('>' == c) {
+				}else if ('>' == c) {
 					prs->context = C_TAG_END;
 					re = 1;
 					break;
@@ -791,8 +785,7 @@ sax_core (iksparser *prs, char *buf, int len)
 					prs->atts[prs->attcur] = NULL;
 					prs->context = C_TAG_END;
 					break;
-				}
-				if ('>' == c) {
+				}else if ('>' == c) {
 					prs->atts[prs->attcur] = NULL;
 					prs->context = C_TAG_END;
 					re = 1;
@@ -807,8 +800,7 @@ sax_core (iksparser *prs, char *buf, int len)
 				if ('\'' == c) {
 					prs->context = C_VALUE_APOS;
 					break;
-				}
-				if ('"' == c) {
+				}else if ('"' == c) {
 					prs->context = C_VALUE_QUOT;
 					break;
 				}
@@ -899,8 +891,7 @@ sax_core (iksparser *prs, char *buf, int len)
 				if ('[' == c) {
 					prs->context = C_SECT;
 					break;
-				}
-				if ('-' == c) {
+				}else if ('-' == c) {
 					prs->context = C_COMMENT;
 					break;
 				}
