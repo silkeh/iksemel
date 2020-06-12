@@ -206,6 +206,25 @@ iks_append (iks *x, const char *name)
 }
 
 iks *
+iks_set_cdata(iks *x, const char *data, size_t len)
+{
+	iks *y;
+
+	if (!x || !data) return NULL;
+	if (len == 0) len = strlen(data);
+
+	while (1) {
+		y = iks_child(x);
+		if (!y) break;
+		iks_hide(y);
+	}
+
+	y = iks_insert_cdata(x, data, len);
+	return y;
+}
+
+
+iks *
 iks_prepend (iks *x, const char *name)
 {
 	iks *y;
@@ -223,6 +242,28 @@ iks_prepend (iks *x, const char *name)
 	x->prev = y;
 	y->parent = x->parent;
 	y->next = x;
+
+	return y;
+}
+
+iks *
+iks_insert_sibling (iks *x, const char *name)
+{
+    iks *y;
+
+    if (!x) return NULL;
+    y = iks_new_within(name, x->s);
+    if (!y) return NULL;
+
+	if (x->next) {
+		x->next->prev = y;
+	} else {
+		IKS_TAG_LAST_CHILD(x->parent) = y;
+	}
+	y->next = x->next;
+	x->next = y;
+	y->parent = x->parent;
+	y->prev = x;
 
 	return y;
 }

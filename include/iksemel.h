@@ -1,5 +1,5 @@
 /* iksemel (XML parser for Jabber)
-** Copyright (C) 2000-2007 Gurer Ozen
+** Copyright (C) 2000-2007 Gurer Ozen <madcat@e-kolay.net>
 ** This code is free software; you can redistribute it and/or
 ** modify it under the terms of GNU Lesser General Public License.
 */
@@ -57,13 +57,15 @@ typedef struct iks_struct iks;
 iks *iks_new (const char *name);
 iks *iks_new_within (const char *name, ikstack *s);
 iks *iks_insert (iks *x, const char *name);
+iks *iks_insert_sibling (iks *x, const char *name);
 iks *iks_insert_cdata (iks *x, const char *data, size_t len);
+iks *iks_append (iks *x, const char *name);
+iks *iks_append_cdata(iks *x, const char *data, size_t len);
+iks *iks_prepend(iks *x, const char *name);
+iks *iks_prepend_cdata(iks *x, const char *data, size_t len);
+iks *iks_set_cdata(iks *x, const char *data, size_t len);
 iks *iks_insert_attrib (iks *x, const char *name, const char *value);
 iks *iks_insert_node (iks *x, iks *y);
-iks *iks_append (iks *x, const char *name);
-iks *iks_prepend (iks *x, const char *name);
-iks *iks_append_cdata (iks *x, const char *data, size_t len);
-iks *iks_prepend_cdata (iks *x, const char *data, size_t len);
 void iks_hide (iks *x);
 void iks_delete (iks *x);
 iks *iks_next (iks *x);
