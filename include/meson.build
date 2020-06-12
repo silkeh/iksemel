@@ -1,4 +1,5 @@
 cc = meson.get_compiler('c')
+
 cdata = configuration_data()
 cdata.set('version', version)
 cdata.set('package_name', package_name)
@@ -39,6 +40,66 @@ foreach f : check_functions
   endif
 endforeach
 
+backends = []
+
+# *** Checks for GnuTLS     ***
+gnutls_dep = dependency('gnutls', version: '>= 3.6.5', required: get_option('gnutls'))
+
+if gnutls_dep.found()
+  backends = ['gnutls']
+  cdata.set('HAVE_GNUTLS', 1)
+endif
+
+# *** Checks for OpenSSL    ***
+openssl_option = get_option('openssl')
+if openssl_option.disabled()
+  openssl_dep = []
+else
+  # XXX: https://github.com/mesonbuild/meson/issues/2945
+  openssl_dep = dependency('openssl', required: false)
+  if openssl_dep.found()
+    backends += ['openssl']
+    cdata.set('HAVE_OPENSSL', 1)
+
+  else
+    # MSVC builds of OpenSSL does not generate pkg-config files,
+    # so we check for it manually here in this case, if we can't find those files
+    # Based on the CMake check for OpenSSL in CURL's CMakeLists.txt,
+    # on which headers we should check for
+    openssl_headers = []
+    foreach h : ['crypto.h', 'engine.h', 'err.h', 'pem.h',
+                 'rsa.h', 'ssl.h', 'x509.h', 'rand.h', 'tls1.h']
+      openssl_headers += 'openssl/' + h
+    endforeach
+
+    # OpenSSL 1.1.x and 1.0.x (or earlier) have different .lib names,
+    # so we need to look for the correct pair
+
+    # Find either libcrypto.lib (1.1.x) or libeay32.lib (1.0.x or earlier) first
+    libcrypto_dep = cc.find_library('crypto', required: false)
+    if libcrypto_dep.found()
+      libssl = 'ssl'
+    else
+      libcrypto_dep = cc.find_library('eay32', required: openssl_option)
+      libssl = 'ssleay32'
+    endif
+
+    if libcrypto_dep.found()
+      # Find the corresponding SSL library depending on which crypto .lib we found
+      libssl_dep = cc.find_library(libssl, required: openssl_option, has_headers: openssl_headers)
+    endif
+
+    if libcrypto_dep.found() and libssl_dep.found()
+      openssl_dep = [libcrypto_dep, libssl_dep]
+      backends += ['openssl']
+      cdata.set('HAVE_OPENSSL', 1)
+    endif
+  endif
+endif
+
+if backends.length() == 0
+  warning('No TLS backends enabled. Please enable at least one TLS backend [GnuTLS or OpenSSL] to use Jabber.')
+endif
 
 configure_file(input : 'config.h.meson',
   output : 'config.h',

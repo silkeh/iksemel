@@ -28,6 +28,20 @@ option('with_tools',
       description : 'build with iksemel toolkit'
       )
 
+
+option('gnutls',
+       type: 'feature',
+       value: 'disabled',
+       description: 'support for GnuTLS networking configration'
+       )
+
+option('openssl',
+       type: 'feature',
+       value: 'disabled',
+       description: 'support for OpenSSL networking configration'
+       )
+
+
 option('with_python',
        type : 'boolean',
        value : false,
