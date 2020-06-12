@@ -54,35 +54,35 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #mesondefine LT_OBJDIR
 
+/* Define to 1 if you have the ANSI C header files. */
+#mesondefine STDC_HEADERS
+
 /* Name of package */
-#mesondefine PACKAGE
+#define PACKAGE "@package_name"
 
 /* Define to the address where bug reports for this package should be sent. */
-#mesondefine PACKAGE_BUGREPORT
+#define PACKAGE_BUGREPORT "@package_bugreport_url"
 
 /* Define to the full name of this package. */
-#mesondefine PACKAGE_NAME
+#define PACKAGE_NAME "@package_name"
 
 /* Define to the full name and version of this package. */
-#mesondefine PACKAGE_STRING
+#define PACKAGE_STRING "@package_name"
 
 /* Define to the one symbol short name of this package. */
 #mesondefine PACKAGE_TARNAME
 
 /* Define to the home page for this package. */
-#mesondefine PACKAGE_URL
+#define PACKAGE_URL "@package_url"
 
 /* Define to the version of this package. */
-#mesondefine PACKAGE_VERSION
-
-/* Define to 1 if you have the ANSI C header files. */
-#mesondefine STDC_HEADERS
+#define PACKAGE_VERSION "@version@"
 
 /* Define this is you want default transport */
 #mesondefine USE_DEFAULT_IO
 
 /* Version number of package */
-#mesondefine VERSION
+#define VERSION "@version@"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #mesondefine const

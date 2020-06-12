@@ -3,6 +3,31 @@ option('version',
        value : '1.6',
        description : 'Project version'
        )
+
+option('package_name',
+      type : 'string',
+      value : '1.6',
+      description : 'Project Name'
+      )
+
+option('package_url',
+      type : 'string',
+      value : 'https://github.com/Zaryob/iksemel',
+      description : 'Project Url'
+      )
+      
+option('package_bugreport_url',
+      type : 'string',
+      value : 'https://github.com/Zaryob/iksemel/issues',
+      description : 'Project Url'
+      )
+
+option('with_tools',
+      type : 'boolean',
+      value : false,
+      description : 'build with iksemel toolkit'
+      )
+
 option('with_python',
        type : 'boolean',
        value : false,

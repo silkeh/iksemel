@@ -1,5 +1,9 @@
 cc = meson.get_compiler('c')
 cdata = configuration_data()
+cdata.set('version', version)
+cdata.set('package_name', package_name)
+cdata.set('package_url', package_url)
+
 check_headers = [
   ['HAVE_DLFCN_H', 'dlfcn.h'],
   ['HAVE_ERRNO_H', 'errno.h'],
@@ -39,6 +43,7 @@ endforeach
 configure_file(input : 'config.h.meson',
   output : 'config.h',
   configuration : cdata)
+
 
 install_headers([
                  'common.h',

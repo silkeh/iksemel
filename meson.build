@@ -2,7 +2,9 @@ project('iksemel','c',
   default_options : ['warning_level=3'])
 
 version = get_option('version')
-
+package_name =  get_option('package_name')
+package_url =  get_option('package_url')
+package_bugreport_url =  get_option('package_bugreport_url')
 
 include_dir = include_directories('include')
 
@@ -15,6 +17,10 @@ endif
 
 if get_option('with_python')
   subdir('python')
+endif
+
+if get_option('with_tools')
+  subdir('tools')
 endif
 
 pkgconf = configuration_data()
