@@ -1,21 +1,3 @@
-py_sources=[
-            'document.c',
-            'exceptions.c',
-            'jid.c',
-            'node.c',
-            'pyiksemel.c',
-            'reference.c',
-            'stream.c',
-           ]
-py_headers = [
-              'document.h',
-              'exceptions.h',
-              'jid.h',
-              'node.h',
-              'reference.h',
-              'stream.h',
-             ]
-
 pymod = import('python')
 python = pymod.find_installation(get_option('python'))
 
@@ -34,10 +16,18 @@ else
  python_ext_dep = python_dep.partial_dependency(compile_args: true)
 endif
 
-pyiksemel = python.extension_module('pyiksemel',
-                        py_sources,
-                        dependencies : [python_ext_dep],
-                        include_directories : [include_dir, '.'],
-                        link_with : libiksemel,
-                        install : true,
-                        c_args: pyext_c_args)
+pypathdir = meson.current_build_dir()
+
+pyiksemel = python.extension_module('iksemel',
+                                    'pyiks.c',
+                                    dependencies : [python_ext_dep],
+                                    include_directories : [include_dir],
+                                    link_with : libiksemel,
+                                    install : true,
+                                    c_args: pyext_c_args,
+                                    )
+
+# Add Tests
+if get_option('tests')
+  subdir('test')
+endif

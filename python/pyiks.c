@@ -1,11 +1,132 @@
+/*
+** Copyright (c) 2016 Aquila NIPALENSIS
+**
+** This program is free software; you can redistribute it and/or modify it
+** under the terms of the GNU General Public License as published by the
+** Free Software Foundation; either version 3 of the License, or (at your
+** option) any later version. Please read the COPYING file.
+*/
 
-#include "exceptions.h"
-#include "document.h"
-#include "node.h"
+#include <Python.h>
+#include "iksemel.h"
 
 PyObject *iksemel_module;
 
-/*** Functions ***/
+
+/*** Exceptions ***/
+
+static PyObject *ParseError;
+static PyObject *NotTag;
+static PyObject *NotData;
+
+/*** Types ***/
+
+typedef struct {
+	PyObject_HEAD
+	iks *document;
+} Document;
+
+typedef struct {
+	PyObject_HEAD
+	Document *doc;
+	iks *node;
+} Node;
+
+typedef struct {
+	PyObject_HEAD
+	Document *doc;
+	iks *node;
+	int tags;
+	char *tagname;
+} Iter;
+
+static void Document_dealloc(Document *self);
+
+static PyTypeObject Document_type = {
+	PyVarObject_HEAD_INIT(NULL,0)
+	"iksemel.Document",	/* tp_name */
+	sizeof(Document),	/* tp_basicsize */
+	0,			/* tp_itemsize */
+	(destructor)Document_dealloc,	/* tp_dealloc */
+	0,			/* tp_print */
+	0,			/* tp_getattr */
+	0,			/* tp_setattr  */
+	0,			/* tp_compare */
+	0,			/* tp_repr */
+	0,			/* tp_as_number */
+	0,			/* tp_as_sequence */
+	0,			/* tp_as_mapping */
+	0,			/* tp_hash */
+	0,			/* tp_call */
+	0,			/* tp_str */
+	0,			/* tp_getattro */
+	0,			/* tp_setattro */
+	0,			/* tp_as_buffer */
+	Py_TPFLAGS_DEFAULT,	/* tp_flags */
+	"XML doc object",	/* tp_doc */
+	0,			/* tp_traverse */
+	0,			/* tp_clear */
+	0,			/* tp_richcompare */
+	0,			/* tp_weaklistoffset */
+	0,			/* tp_iter */
+	0,			/* tp_iternext */
+	0,			/* tp_methods */
+	0,			/* tp_members */
+	0,			/* tp_getset */
+	0,			/* tp_base */
+	0,			/* tp_dict */
+	0,			/* tp_descr_get */
+	0,			/* tp_descr_set */
+	0,			/* tp_dictoffset */
+	0,			/* tp_init */
+	0,			/* tp_alloc */
+	0			/* tp_new */
+};
+
+static PyObject *Iter_iter(Iter *self);
+static PyObject *Iter_next(Iter *self);
+
+static PyTypeObject Iter_type = {
+	PyVarObject_HEAD_INIT(NULL,0)
+	"iksemel.Iter",	/* tp_name */
+	sizeof(Iter),		/* tp_basicsize */
+	0,			/* tp_itemsize */
+	0,			/* tp_dealloc */
+	0,			/* tp_print */
+	0,			/* tp_getattr */
+	0,			/* tp_setattr  */
+	0,			/* tp_compare */
+	0,			/* tp_repr */
+	0,			/* tp_as_number */
+	0,			/* tp_as_sequence */
+	0,			/* tp_as_mapping */
+	0,			/* tp_hash */
+	0,			/* tp_call */
+	0,			/* tp_str */
+	0,			/* tp_getattro */
+	0,			/* tp_setattro */
+	0,			/* tp_as_buffer */
+	Py_TPFLAGS_DEFAULT,	/* tp_flags */
+	"XML iter object",	/* tp_doc */
+	0,			/* tp_traverse */
+	0,			/* tp_clear */
+	0,			/* tp_richcompare */
+	0,			/* tp_weaklistoffset */
+	(getiterfunc)Iter_iter,	/* tp_iter */
+	(iternextfunc)Iter_next,/* tp_iternext */
+	0,			/* tp_methods */
+	0,			/* tp_members */
+	0,			/* tp_getset */
+	0,			/* tp_base */
+	0,			/* tp_dict */
+	0,			/* tp_descr_get */
+	0,			/* tp_descr_set */
+	0,			/* tp_dictoffset */
+	0,			/* tp_init */
+	0,			/* tp_alloc */
+	0			/* tp_new */
+};
+
 static void Node_dealloc(Node *self);
 static PyObject *Node_iter(Node *self);
 static PyObject *Node_type_func(Node *self);
@@ -98,7 +219,7 @@ static PyMethodDef Node_methods[] = {
 };
 
 static PyTypeObject Node_type = {
-	PyVarObject_HEAD_INIT(NULL, 0)
+	PyVarObject_HEAD_INIT(NULL,0)
 	"iksemel.Node",	/* tp_name */
 	sizeof(Node),		/* tp_basicsize */
 	0,			/* tp_itemsize */
@@ -138,15 +259,72 @@ static PyTypeObject Node_type = {
 	0			/* tp_new */
 };
 
+static void
+Document_dealloc(Document *self)
+{
+	if (self->document) iks_delete(self->document);
+	PyTypeObject* ob_type(PyObject *self);
+}
+
+static PyObject *
+new_node(Document *doc, iks *xml)
+{
+	Node *node;
+	int ref = 1;
+
+	if (!xml) return PyErr_NoMemory();
+
+	if (!doc) {
+		doc = PyObject_New(Document, &Document_type);
+		doc->document = xml;
+		ref = 0;
+	}
+	node = PyObject_New(Node, &Node_type);
+	node->doc = doc;
+	if (ref) {
+		Py_INCREF(doc);
+	}
+	node->node = xml;
+	return (PyObject *)node;
+}
+
+static PyObject *
+Iter_iter(Iter *self)
+{
+	Py_INCREF(self);
+	return (PyObject *)self;
+}
+
+static PyObject *
+Iter_next(Iter *self)
+{
+	iks *node;
+
+	node = self->node;
+	if (!node) return NULL;
+
+	if (self->tags) {
+		self->node = iks_next_tag(node);
+		if (self->node && self->tagname) {
+			while (self->node && (strcmp(self->tagname, iks_name(self->node)) != 0)) {
+				self->node = iks_next_tag(self->node);
+			}
+		}
+	} else {
+		self->node = iks_next(node);
+	}
+
+	return new_node(self->doc, node);
+}
 
 static PyObject *
 Node_iter(Node *self)
 {
 	Iter *iter;
-	int e= iks_type(self->node) != IKS_TAG;
 
-	if (e) {
-		exceptions_object_nottag(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	iter = PyObject_New(Iter, &Iter_type);
@@ -189,7 +367,6 @@ Node_reduce(Node *self, PyObject *args)
 
 	dict = PyModule_GetDict(iksemel_module);
 	if (!dict) return NULL;
-
 	func = PyDict_GetItemString(dict, "parseString");
 	if (!func) return NULL;
 
@@ -206,9 +383,9 @@ Node_data(Node *self)
 {
 	PyObject *ret;
 
-	int e= iks_type(self->node) != IKS_CDATA;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_CDATA) {
+		PyErr_SetNone(NotData);
+		return NULL;
 	}
 
 	ret = Py_BuildValue("s", iks_cdata(self->node));
@@ -218,9 +395,9 @@ Node_data(Node *self)
 static PyObject *
 Node_name(Node *self)
 {
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	return Py_BuildValue("s", iks_name(self->node));
@@ -232,9 +409,9 @@ Node_attributes(Node *self, PyObject *args)
 	PyObject *ret, *p;
 	iks *attr;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	ret = PyList_New(0);
@@ -255,9 +432,9 @@ Node_getAttribute(Node *self, PyObject *args)
 	char *name;
 	char *val;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	if (!PyArg_ParseTuple(args, "s", &name))
@@ -279,9 +456,9 @@ Node_setAttribute(Node *self, PyObject *args)
 	char *name;
 	char *value;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	if (!PyArg_ParseTuple(args, "sz", &name, &value))
@@ -298,10 +475,10 @@ Node_setData(Node *self, PyObject *args)
 {
     char *data;
 
-		int e= iks_type(self->node) != IKS_TAG;
-		if (e){
-			exceptions_object_notdata(e);
-		}
+    if (iks_type(self->node) != IKS_TAG) {
+        PyErr_SetNone(NotTag);
+        return NULL;
+    }
 
     if (!PyArg_ParseTuple(args, "s", &data))
         return NULL;
@@ -318,9 +495,9 @@ Node_getTag(Node *self, PyObject *args)
 	iks *child;
 	char *name;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	if (!PyArg_ParseTuple(args, "s", &name))
@@ -341,9 +518,10 @@ Node_getTagData(Node *self, PyObject *args)
 	PyObject *ret;
 	char *name;
 	char *data;
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	if (!PyArg_ParseTuple(args, "s", &name))
@@ -368,9 +546,9 @@ Node_tags(Node *self, PyObject *args)
 	if (!PyArg_ParseTuple(args, "|s", &name))
 		return NULL;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	iter = PyObject_New(Iter, &Iter_type);
@@ -391,9 +569,9 @@ Node_firstChild(Node *self)
 {
 	iks *child;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	child = iks_child(self->node);
@@ -573,9 +751,9 @@ Node_toPrettyString(Node *self, PyObject *args)
 	iks *tree, *a;
 	char *str;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	ctx.level = 1;
@@ -601,9 +779,9 @@ Node_insertTag(Node *self, PyObject *args)
 	iks *node;
 	char *name;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	if (!PyArg_ParseTuple(args, "s", &name))
@@ -658,9 +836,9 @@ Node_insertData(Node *self, PyObject *args)
 	iks *node;
 	char *value;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	if (!PyArg_ParseTuple(args, "s", &value))
@@ -715,9 +893,9 @@ Node_insertNode(Node *self, PyObject *args)
 	iks *child;
 	Node *node;
 
-	int e= iks_type(self->node) != IKS_TAG;
-	if (e){
-		exceptions_object_notdata(e);
+	if (iks_type(self->node) != IKS_TAG) {
+		PyErr_SetNone(NotTag);
+		return NULL;
 	}
 
 	if (!PyArg_ParseTuple(args, "O!", &Node_type, &node))
@@ -738,17 +916,124 @@ Node_hide(Node *self, PyObject *args)
 	return Py_None;
 }
 
-void
-Setup_Node(PyObject *module)
+/*** Module Functions ***/
+
+static PyObject *
+ciks_parse(PyObject *self, PyObject *args)
 {
+	char *file;
+	iks *doc;
+	int e;
+
+	if (!PyArg_ParseTuple(args, "s", &file))
+		return NULL;
+
+	e = iks_load(file, &doc);
+	switch (e) {
+		case IKS_OK:
+			break;
+		case IKS_NOMEM:
+			return PyErr_NoMemory();
+		case IKS_BADXML:
+			PyErr_SetNone(ParseError);
+			return NULL;
+		default:
+			return PyErr_SetFromErrnoWithFilename(PyExc_OSError, file);
+	}
+
+	return new_node(NULL, doc);
+}
+
+static PyObject *
+ciks_parseString(PyObject *self, PyObject *args)
+{
+	iks *doc;
+	char *str;
+	int e;
+
+	if (!PyArg_ParseTuple(args, "s", &str))
+		return NULL;
+
+	doc = iks_tree(str, 0, &e);
+	if (!doc) {
+		if (e == IKS_NOMEM) {
+			return PyErr_NoMemory();
+		} else {
+			PyErr_SetNone(ParseError);
+			return NULL;
+		}
+	}
+
+	return new_node(NULL, doc);
+}
+
+static PyObject *
+ciks_newDocument(PyObject *self, PyObject *args)
+{
+	iks *doc;
+	char *name;
+
+	if (!PyArg_ParseTuple(args, "s", &name))
+		return NULL;
+
+	doc = iks_new(name);
+
+	return new_node(NULL, doc);
+}
+
+static PyMethodDef methods[] = {
+	{ "parse", ciks_parse, METH_VARARGS,
+	  "Parse given XML file and generate document tree."},
+	{ "parseString", ciks_parseString, METH_VARARGS,
+	  "Parse given XML string and generate document tree."},
+	{ "newDocument", ciks_newDocument, METH_VARARGS,
+	  "Create a new document with given root tag name."},
+	{ NULL, NULL, 0, NULL }
+};
+static struct PyModuleDef iksemelmodule ={
+	PyModuleDef_HEAD_INIT,
+	"iksemel",
+	NULL,
+	-1,
+	methods
+};
+
+__attribute__((visibility("default")))
+PyMODINIT_FUNC
+PyInit_iksemel(void)
+{
+	PyObject *m;
+
+	m = PyModule_Create(&iksemelmodule);
 	/* constants */
-	PyModule_AddIntConstant(module, "TAG", IKS_TAG);
-	PyModule_AddIntConstant(module, "ATTRIBUTE", IKS_ATTRIBUTE);
-	PyModule_AddIntConstant(module, "DATA", IKS_CDATA);
-
+	PyModule_AddIntConstant(m, "TAG", IKS_TAG);
+	PyModule_AddIntConstant(m, "ATTRIBUTE", IKS_ATTRIBUTE);
+	PyModule_AddIntConstant(m, "DATA", IKS_CDATA);
+	/* exceptions */
+	ParseError = PyErr_NewException("iksemel.ParseError", NULL, NULL);
+	Py_INCREF(ParseError);
+	PyModule_AddObject(m, "ParseError", ParseError);
+	NotTag = PyErr_NewException("iksemel.NotTag", NULL, NULL);
+	Py_INCREF(NotTag);
+	PyModule_AddObject(m, "NotTag", NotTag);
+	NotData = PyErr_NewException("iksemel.NotData", NULL, NULL);
+	Py_INCREF(NotData);
+	PyModule_AddObject(m, "NotData", NotData);
+	/* types */
+	Document_type.tp_new = PyType_GenericNew;
+	if (PyType_Ready(&Document_type) < 0)
+		return 0;
+	Py_INCREF(&Document_type);
+	Iter_type.tp_new = PyType_GenericNew;
+	if (PyType_Ready(&Iter_type) < 0)
+		return 0;
+	Py_INCREF(&Iter_type);
 	Node_type.tp_new = PyType_GenericNew;
-	if (PyType_Ready(&Node_type) < 0) return;
+	if (PyType_Ready(&Node_type) < 0)
+		return 0;
 	Py_INCREF(&Node_type);
-	PyModule_AddObject(module, "Node", (PyObject *)&Node_type);
+	PyModule_AddObject(m, "Node", (PyObject *)&Node_type);
 
+	iksemel_module = m;
+	return m;
 }
