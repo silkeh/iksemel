@@ -15,7 +15,7 @@ sources = [
             'base64.c',
            ]
 
-libiksemel = shared_library('libiksemel',
+libiksemel = shared_library('iksemel',
                         sources,
                         include_directories : include_dir,
                         #dependencies : python_dep,
