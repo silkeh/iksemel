@@ -22,6 +22,7 @@ endif
 
 # Add Python Bindings
 if get_option('with_python')
+  py_include_dir = include_directories('python')
   subdir('python')
 endif
 
