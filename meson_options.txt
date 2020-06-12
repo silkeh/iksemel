@@ -16,6 +16,6 @@ option('python',
 
 option('tests',
       type : 'boolean',
-      value : false,
-      description : 'control iksemel with unittests'
+      value : true,
+      description : 'Control iksemel with UnitTests'
       )

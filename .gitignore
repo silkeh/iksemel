@@ -32,3 +32,6 @@
 *.dSYM/
 *.su
 .pypi.rc
+
+# Meson build
+build/
