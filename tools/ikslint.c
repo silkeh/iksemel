@@ -267,7 +267,7 @@ main (int argc, char *argv[])
 				print_usage ();
 				exit (0);
 			case 'V':
-				puts ("ikslint (iksemel) "VERSION);
+				printf("ikslint (iksemel) %s ", VERSION);
 				exit (0);
 		}
 	}
