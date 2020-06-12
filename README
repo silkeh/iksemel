@@ -1,10 +1,13 @@
 
-                      iksemel 1.5
+                      iksemel 1.6
 
             http://code.google.com/p/iksemel
 
+Owner:
 Copyright (c) 2000-2011 Gurer Ozen <meduketto at gmail.com>
 
+Changes and adaptations:
+Copyright (c) 2016-2020 Suleyman Poyraz <zaryob.dev at gmail.com>
 
 Introduction:
 -------------
@@ -19,12 +22,11 @@ License. A copy of the license is included in the COPYING file.
 Requirements:
 -------------
 
-Libtool, Automake and Autoconf packages are required for compiling cvs
-versions.
+Meson and Ninja packages are required for compiling cvs versions.
 
-TLS support requires OpenSSL (>0.9.8) or GNUTLS (>2.0.0) library.
+TLS support requires OpenSSL (>1.1.0) or GNUTLS (>2.0.0) library.
 
-Python bindings requires Python (>2.2).
+Python bindings requires Python (>3.3).
 
 
 Compiling & Install:
@@ -32,20 +34,19 @@ Compiling & Install:
 
 If you got the source from CVS, type
 
-  ./autogen.sh
+  meson build_dir
 
 for creating configuration script and files.
 
 Then type
 
-  ./configure
-  make
+  ninja -C build
 
 now library is compiled. You can test it with
 
-  make check
+  ninja test -C build
 
 and install it with
 
   (become root if necessary)
-  make install
+  ninja install -C build
