@@ -24,6 +24,7 @@ pyiksemel = python.extension_module('iksemel',
                                     include_directories : [include_dir],
                                     link_with : libiksemel,
                                     install : true,
+                                    install_dir : python.get_install_dir(pure : false),
                                     c_args: pyext_c_args,
                                     )
 
