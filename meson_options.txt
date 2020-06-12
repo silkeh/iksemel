@@ -15,7 +15,7 @@ option('package_url',
       value : 'https://github.com/Zaryob/iksemel',
       description : 'Project Url'
       )
-      
+
 option('package_bugreport_url',
       type : 'string',
       value : 'https://github.com/Zaryob/iksemel/issues',
