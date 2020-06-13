@@ -23,25 +23,26 @@ libiksemel = shared_library('iksemel',
                         sources,
                         include_directories : include_dir,
                         install : true)
+if get_option('gnutls').enabled()
+  libiksemel_gnutls = shared_library('iksemel_gnutls',
+                          [gnutls_sources],
+                          include_directories : include_dir,
+                          link_with: libiksemel,
+                          link_args: '-lgnutls',
+                          dependencies : gnutls_dep,
+                          install : true,
+                          required: get_option('gnutls'))
+endif
 
-libiksemel_gnutls = shared_library('iksemel_gnutls',
-                        [gnutls_sources],
-                        include_directories : include_dir,
-                        link_with: libiksemel,
-                        link_args: '-lgnutls',
-                        dependencies : gnutls_dep,
-                        install : true,
-                        required: get_option('gnutls'))
-
-libiksemel_openssl = shared_library('iksemel_openssl',
+if get_option('openssl').enabled()
+  libiksemel_openssl = shared_library('iksemel_openssl',
                         openssl_sources,
                         include_directories : include_dir,
                         link_with: libiksemel,
                         dependencies : openssl_dep,
                         install : true,
                         required: get_option('openssl'))
-
-
+endif
 
 link_jabber = []
 dep_jabber = []
