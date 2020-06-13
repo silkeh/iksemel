@@ -53,9 +53,13 @@ backends = []
 # *** Checks for GnuTLS     ***
 gnutls_dep = dependency('gnutls', version: '>= 3.6.5', required: get_option('gnutls'))
 
-if gnutls_dep.found()
-  backends = ['gnutls']
-  cdata.set('HAVE_GNUTLS', 1)
+if get_option('gnutls').enabled()
+  if gnutls_dep.found()
+    backends = ['gnutls']
+    cdata.set('HAVE_GNUTLS', 1)
+  else
+    error('\"gnutls\" feature enabled but not \"gnutls\" installation found on your installation.')
+  endif
 endif
 
 # *** Checks for OpenSSL    ***
