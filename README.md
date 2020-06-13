@@ -1,3 +1,4 @@
+[![Travis Status](https://travis-ci.org/Zaryob/iksemel.svg?branch=master)](https://travis-ci.org/Zaryob/iksemel) [![Language](https://img.shields.io/badge/language-c-blue.svg) [![License](https://img.shields.io/badge/license-LGPL2-purple.svg)
 
                       iksemel 1.6
 
