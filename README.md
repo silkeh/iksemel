@@ -1,4 +1,6 @@
-[![Travis Status](https://travis-ci.org/Zaryob/iksemel.svg?branch=master)](https://travis-ci.org/Zaryob/iksemel) ![Language](https://img.shields.io/badge/language-c-blue.svg) ![License](https://img.shields.io/badge/license-LGPL2-purple.svg)
+![Issues](https://img.shields.io/github/issues-raw/Zaryob/iksemel?style=for-the-badge) ![PullRequests](https://img.shields.io/github/issues-pr-raw/Zaryob/iksemel?style=for-the-badge)
+
+[![Travis Status](https://travis-ci.org/Zaryob/iksemel.svg?branch=master)](https://travis-ci.org/Zaryob/iksemel) ![Language](https://img.shields.io/badge/language-c-blue.svg) ![License](https://img.shields.io/badge/license-LGPL2-purple.svg) [![Document](https://img.shields.io/badge/document-gh--pages-blue)](https://zaryob.github.io/iksemels)
 
                       iksemel 1.6
 
