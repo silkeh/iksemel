@@ -6,10 +6,17 @@
 
 #include "config.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/types.h>
 #include <stdio.h>
-#include <stdarg.h>
+
+#ifdef STDC_HEADERS
 #include <stdlib.h>
+#include <stdarg.h>
+#endif
 
 #ifdef HAVE_STRING_H
 #include <string.h>

@@ -40,6 +40,14 @@ foreach f : check_functions
   endif
 endforeach
 
+if cc.has_link_argument('-DHAVE_CONFIG_H')
+  cdata.set('HAVE_CONFIG_H', 1)
+endif
+
+if cc.has_link_argument('-DSTDC_HEADERS')
+  cdata.set('STDC_HEADERS', 1)
+endif
+
 backends = []
 
 # *** Checks for GnuTLS     ***
