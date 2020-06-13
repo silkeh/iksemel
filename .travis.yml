@@ -1,0 +1,32 @@
+sudo: required
+language: c
+compiler:
+  - gcc
+  - clang
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise
+    packages:
+    - gcc
+    - g++
+    - clang
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install python3-pip python3-dev build-essential libssl-dev
+  - sudo pip3 install --upgrade pip
+  - sudo pip3 install meson ninja
+
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++" CC="gcc"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++" CC="clang"; fi
+
+script:
+  - mkdir build
+  - meson build -D openssl=enabled -D gnutls=disabled -D with_tools=true -D with_python=true
+  - cd build
+  - ninja
+  - ninja test
