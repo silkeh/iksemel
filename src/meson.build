@@ -28,6 +28,7 @@ libiksemel_gnutls = shared_library('iksemel_gnutls',
                         [gnutls_sources],
                         include_directories : include_dir,
                         link_with: libiksemel,
+                        link_args: '-lgnutls',
                         dependencies : gnutls_dep,
                         install : true,
                         required: get_option('gnutls'))

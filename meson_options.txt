@@ -28,7 +28,7 @@ option('with_tools',
       description : 'build with iksemel toolkit'
       )
 
-
+# TLS of jabber is soo old. Due to the fact that disabled for a short term.
 option('gnutls',
        type: 'feature',
        value: 'disabled',

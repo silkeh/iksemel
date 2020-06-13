@@ -1,5 +1,8 @@
 project('iksemel','c',
-  default_options : ['warning_level=3'])
+  default_options : ['warning_level=3'],
+  license: 'LGPL2.1+',
+  meson_version: '>= 0.50.0',
+)
 
 # Iksemel specific declarations
 
