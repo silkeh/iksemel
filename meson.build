@@ -11,6 +11,23 @@ package_name = get_option('package_name')
 package_url = get_option('package_url')
 package_bugreport_url =  get_option('package_bugreport_url')
 
+cc = meson.get_compiler('c')
+host_system = host_machine.system()
+
+# compiler flags
+common_flags = [
+  '-DSTDC_HEADERS',
+  '-DHAVE_CONFIG_H',
+]
+
+add_project_arguments(common_flags, language: 'c')
+
+cflags = cc.get_supported_arguments(['-Werror=implicit-function-declaration'])
+# Possibly can add new flags like '-Werror=declaration-after-statement'
+
+add_project_arguments(cflags, language: 'c')
+
+
 # Add indispensable  subdirectories
 include_dir = include_directories('include')
 
