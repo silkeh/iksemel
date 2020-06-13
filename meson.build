@@ -9,7 +9,6 @@ package_url = get_option('package_url')
 package_bugreport_url =  get_option('package_bugreport_url')
 
 # Add indispensable  subdirectories
-
 include_dir = include_directories('include')
 
 subdir('include')
