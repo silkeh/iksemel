@@ -12,6 +12,7 @@ sources = [
 
 gnutls_sources = ['tls-gnutls.c']
 openssl_sources = ['tls-openssl.c']
+backend_libs = ''
 
 jabber_sources = [
                   'filter.c',
@@ -23,8 +24,9 @@ libiksemel = shared_library('iksemel',
                         sources,
                         include_directories : include_dir,
                         install : true)
-                        
+
 if get_option('gnutls').enabled()
+  backend_libs += '-lgnutls'
   libiksemel_gnutls = shared_library('iksemel_gnutls',
                           [gnutls_sources],
                           include_directories : include_dir,
@@ -36,10 +38,12 @@ if get_option('gnutls').enabled()
 endif
 
 if get_option('openssl').enabled()
+  # backend_libs += '-lssl -lcrypto'
   libiksemel_openssl = shared_library('iksemel_openssl',
                         openssl_sources,
                         include_directories : include_dir,
                         link_with: libiksemel,
+                        # link_args: '-lssl -lcrypto',
                         dependencies : openssl_dep,
                         install : true,
                         required: get_option('openssl'))
@@ -47,6 +51,7 @@ endif
 
 link_jabber = []
 dep_jabber = []
+
 src_jabber = [jabber_sources]
 if get_option('gnutls').enabled()
   link_jabber += libiksemel_gnutls
@@ -66,4 +71,23 @@ if backends.length() != 0
                           dependencies : dep_jabber,
                           link_with : [libiksemel, link_jabber],
                           install : true)
+
+  # Write pkgconfig of jabber
+  jabber_pkgconf = configuration_data()
+
+  jabber_pkgconf.set('prefix', join_paths(get_option('prefix')))
+  jabber_pkgconf.set('exec_prefix', '${prefix}')
+  jabber_pkgconf.set('includedir', join_paths('${prefix}', get_option('includedir')))
+  jabber_pkgconf.set('libdir', join_paths('${prefix}', get_option('libdir')))
+  jabber_pkgconf.set('datarootdir', join_paths('${prefix}', get_option('datadir')))
+  jabber_pkgconf.set('datadir', '${datarootdir}')
+  jabber_pkgconf.set('backend_libs', backend_libs)
+  jabber_pkgconf.set('VERSION', version)
+
+  pkg_install_dir = '@0@/pkgconfig'.format(get_option('libdir'))
+
+  configure_file(input : 'jabber.pc.in'.format(version),
+    output : 'jabber-@0@.pc'.format(version),
+    configuration : jabber_pkgconf,
+    install_dir : pkg_install_dir)
 endif
