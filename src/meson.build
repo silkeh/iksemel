@@ -23,6 +23,7 @@ libiksemel = shared_library('iksemel',
                         sources,
                         include_directories : include_dir,
                         install : true)
+                        
 if get_option('gnutls').enabled()
   libiksemel_gnutls = shared_library('iksemel_gnutls',
                           [gnutls_sources],

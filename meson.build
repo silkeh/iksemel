@@ -27,6 +27,11 @@ cflags = cc.get_supported_arguments(['-Werror=implicit-function-declaration'])
 
 add_project_arguments(cflags, language: 'c')
 
+if get_option('gnutls').enabled()
+  if get_option('openssl').enabled()
+    error('You cannot use gnutls and openssl at the same time for Jabber support.')
+  endif
+endif
 
 # Add indispensable  subdirectories
 include_dir = include_directories('include')
