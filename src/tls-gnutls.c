@@ -48,11 +48,41 @@ tls_pull (struct ikstls_data *data, char *buffer, size_t len)
 static int
 tls_handshake (struct ikstls_data **datap, ikstransport *trans, void *sock)
 {
-	const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-	const int kx_priority[] = { GNUTLS_KX_RSA, 0 };
-	const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
-	const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
-	const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+
+	/* Section Upgrading to 3.4.x from 3.3.x from https://www.gnutls.org/manual/html_node/Upgrading-from-previous-versions.html */
+	#if defined(GNUTLS_VERSION_NUMBER) && \
+	    GNUTLS_VERSION_NUMBER >= 0x020200 /* 2.2.0 */
+		/* This type of priority setting scheme comes with 2.2.0 version. */
+		char *priority="NORMAL:+VERS-SSL3.0:+VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2:+VERS-TLS1.3RSA:+MD5:+SHA1:+COMP-NULL:+COMP-ZLIB:+3DES-CBC:+ARCFOUR-128";
+		/*
+			Available SSL versions:
+				* VERS-SSL3.0,
+			Available TLS versions:
+				* VERS-TLS1.0,
+				* VERS-TLS1.1,
+				* VERS-TLS1.2,
+				* VERS-TLS1.3,
+			Availability For Key eXchange:
+				* RSA
+			Availability For MAC:
+				* MD5
+				* SHA1
+			Availability For compression:
+				* COMP-NULL
+				* COMP-ZLIB
+			Availability For cipher:
+			https://gnutls.org/manual/html_node/Encryption-algorithms-used-in-the-record-layer.html#tab_003aciphers
+				* 3DES-CBC,
+				* ARCFOUR-128,
+			*/
+	#else
+	  /* This type of priority setting scheme become legacy with 3.4.0 version. */
+		const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+		const int kx_priority[] = { GNUTLS_KX_RSA, 0 };
+		const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
+		const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+		const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+	#endif
 	struct ikstls_data *data;
 	int ret;
 
@@ -81,11 +111,18 @@ tls_handshake (struct ikstls_data **datap, ikstransport *trans, void *sock)
 		return IKS_NOMEM;
 	}
 
+#if defined(GNUTLS_VERSION_NUMBER) && \
+    GNUTLS_VERSION_NUMBER >= 0x020200 /* 2.2.0 */
+	gnutls_priority_set_direct(data->sess, priority, NULL);
+
+#else
 	gnutls_protocol_set_priority (data->sess, protocol_priority);
 	gnutls_cipher_set_priority(data->sess, cipher_priority);
 	gnutls_compression_set_priority(data->sess, comp_priority);
 	gnutls_kx_set_priority(data->sess, kx_priority);
 	gnutls_mac_set_priority(data->sess, mac_priority);
+#endif
+
 	gnutls_credentials_set (data->sess, GNUTLS_CRD_CERTIFICATE, data->cred);
 
 	gnutls_transport_set_push_function (data->sess, (gnutls_push_func) tls_push);
