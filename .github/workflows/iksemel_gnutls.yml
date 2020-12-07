@@ -1,0 +1,28 @@
+name: iksemel
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes -qq build-essential autoconf libtool git python3 python3-dev ninja-build meson gnutls-dev gnutls-bin
+    - name: Basic meson build generation with gnutls support
+      run: |
+        meson build -Dwith_tests=true 
+    - name: Ninja source build
+      run: |
+        cd build 
+        ninja
+    - name: Ninja tests
+      run: |
+        cd build
+        ninja test
