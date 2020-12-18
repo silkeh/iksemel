@@ -26,3 +26,14 @@ jobs:
       run: |
         cd build
         ninja tests
+    - name: Prepare artifacts
+      if: failure()
+      run: |
+        - uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: Logs
+        path: |
+          /home/runner/work/iksemel/iksemel/build/meson-logs/meson-log.txt 
+        if-no-files-found: ignore
+
