@@ -1,4 +1,4 @@
-name: iksemel
+name: iksemel with gnutls
 
 on:
   push:
