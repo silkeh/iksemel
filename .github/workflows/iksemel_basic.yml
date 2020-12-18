@@ -29,7 +29,8 @@ jobs:
     - name: Prepare artifacts
       if: failure()
       run: |
-        - uses: actions/upload-artifact@v2
+          cat /home/runner/work/iksemel/iksemel/build/meson-logs/meson-log.txt 
+    - uses: actions/upload-artifact@v2
       if: failure()
       with:
         name: Logs
