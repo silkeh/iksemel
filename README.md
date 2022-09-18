@@ -37,7 +37,7 @@ Compiling & Install:
 
 If you got the source from CVS, type
 
-  meson build_dir
+  meson build
 
 for creating configuration script and files.
 
@@ -53,3 +53,11 @@ and install it with
 
   (become root if necessary)
   ninja install -C build
+
+Parameters
+----------
+
+* **openssl**: [enabled,disabled] OpenSSL support. (Conflicts with GNUTLS)
+* **gnutls**: [enabled,disabled] GNUTLS support. (Conflicts with OpenSSL)
+* **with_tools**: [true,false] Enable Tools (hash, ikslint, iksperf, iksroster)
+* **with_python**: [true,false] Enable Python support.

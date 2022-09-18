@@ -33,8 +33,7 @@ if get_option('gnutls').enabled()
                           link_with: libiksemel,
                           link_args: '-lgnutls',
                           dependencies : gnutls_dep,
-                          install : true,
-                          required: get_option('gnutls'))
+                          install : true)
 endif
 
 if get_option('openssl').enabled()
@@ -43,10 +42,8 @@ if get_option('openssl').enabled()
                         openssl_sources,
                         include_directories : include_dir,
                         link_with: libiksemel,
-                        # link_args: '-lssl -lcrypto',
                         dependencies : openssl_dep,
-                        install : true,
-                        required: get_option('openssl'))
+                        install : true)
 endif
 
 link_jabber = []

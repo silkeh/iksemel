@@ -22,15 +22,13 @@ jobs:
 
     - name: Basic meson build generation with gnutls support
       run: |
-        meson build -Dwith_tests=true 
+        meson build -Dwith_tests=true
     - name: Ninja source build
       run: |
-        cd build 
-        ninja
+        ninja -C build
     - name: Ninja tests
       run: |
-        cd build
-        ninja test
+        ninja -C build test
     - name: Prepare artifacts
       if: failure()
       run: |
