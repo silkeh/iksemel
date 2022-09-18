@@ -22,7 +22,7 @@ jobs:
 
     - name: Basic meson build generation with gnutls support
       run: |
-        meson build  -D openssl=disabled -D gnutls=enabled
+        meson build -D openssl=enabled -D gnutls=disabled
     - name: Ninja source build
       run: |
         ninja -C build
