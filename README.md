@@ -1,8 +1,8 @@
-![Issues](https://img.shields.io/github/issues-raw/Zaryob/iksemel?style=for-the-badge) ![PullRequests](https://img.shields.io/github/issues-pr-raw/Zaryob/iksemel?style=for-the-badge)
+[![Issues](https://img.shields.io/github/issues-raw/Zaryob/iksemel?style=for-the-badge)](https://github.com/Zaryob/iksemel/issues) [![PullRequests](https://img.shields.io/github/issues-pr-raw/Zaryob/iksemel?style=for-the-badge)](https://github.com/Zaryob/iksemel/pulls)
 
 [![Travis Status](https://travis-ci.org/Zaryob/iksemel.svg?branch=master)](https://travis-ci.org/Zaryob/iksemel) ![Language](https://img.shields.io/badge/language-c-blue.svg) ![License](https://img.shields.io/badge/license-LGPL2-purple.svg) [![Document](https://img.shields.io/badge/document-gh--pages-blue)](https://zaryob.github.io/iksemels)
 
-                      iksemel 1.6
+                      iksemel 1.6.1
 
             http://code.google.com/p/iksemel
 
@@ -10,7 +10,7 @@ Owner:
 Copyright (c) 2000-2011 Gurer Ozen <meduketto at gmail.com>
 
 Changes and adaptations:
-Copyright (c) 2016-2020 Suleyman Poyraz <zaryob.dev at gmail.com>
+Copyright (c) 2016-2022 Suleyman Poyraz <zaryob.dev at gmail.com>
 
 Introduction:
 -------------
