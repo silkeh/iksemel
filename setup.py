@@ -36,29 +36,10 @@ distfiles = """
     src/base64.c
     python/pyiks.c
     python/test/*.py
+    setup.py
 """
 
-if 'dist' in sys.argv:
-    distdir = "iksemel-%s" % version
-    list = []
-    for t in distfiles.split():
-        list.extend(glob.glob(t))
-    if os.path.exists(distdir):
-        shutil.rmtree(distdir)
-    os.mkdir(distdir)
-    for file_ in list:
-        cum = distdir[:]
-        for d in os.path.dirname(file_).split('/'):
-            dn = os.path.join(cum, d)
-            cum = dn[:]
-            if not os.path.exists(dn):
-                os.mkdir(dn)
-        shutil.copy(file_, os.path.join(distdir, file_))
-    os.popen("tar -czf %s %s" % ("iksemel-" + version + ".tar.gz", distdir))
-    shutil.rmtree(distdir)
-    sys.exit(0)
-
-elif 'test' in sys.argv:
+if 'test' in sys.argv:
     import unittest
     test_loader = unittest.TestLoader()
     test_suite = test_loader.discover('python/test/', pattern='*.py')

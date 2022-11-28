@@ -1,0 +1,26 @@
+[project]
+name = "iksemel"
+version = "1.6.1"
+authors = [
+  { name="Suleyman Poyraz", email="zaryob.dev@gmail.com" },
+]
+description = """This is an XML parser library mainly designed for Jabber applications.
+It provides SAX, DOM, and special Jabber stream APIs. Library is coded
+in ANSI C except the network code (which is POSIX compatible), thus
+highly portable. Iksemel is released under GNU Lesser General Public
+License. A copy of the license is included in the COPYING file."""
+readme = "README.md"
+requires-python = ">=3.5"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Zaryob/iksemel"
+"Bug Tracker" = "https://github.com/Zaryob/iksemel/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
