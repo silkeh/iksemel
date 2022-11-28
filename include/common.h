@@ -4,7 +4,8 @@
 ** modify it under the terms of GNU Lesser General Public License.
 */
 
-#include "config.h"
+#ifndef __COMMON_H
+#define __COMMON_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,3 +37,5 @@ extern int errno;
 #endif
 
 #include "finetune.h"
+
+#endif // __COMMON_H

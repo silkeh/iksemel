@@ -3,7 +3,7 @@ V1.6 (upcoming release)
 * Python bindings now can compaliable with python3.x versions.
 * OpenSSL 1.1.x support for jabber
 
-V1.5 ( Not shared with meducetto :( )
+V1.5 ( Not shared by meducetto :( )
 * You can now use OpenSSL or GNUTLS as the TLS back-end (compile time option).
 * Python bindings. You can use iksemel from Python as an XMPP client library
   or as a very fast and memory efficient XML parser.
