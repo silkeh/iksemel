@@ -4,6 +4,7 @@
 ** modify it under the terms of GNU Lesser General Public License.
 */
 
+#include <uchar.h>
 #include "common.h"
 #include "iksemel.h"
 
@@ -569,10 +570,21 @@ escape_size (char *src, size_t len)
 	size_t sz;
 	char c;
 	int i;
+	char32_t mb;
+	mbstate_t state = {0};
 
 	sz = 0;
 	for (i = 0; i < len; i++) {
 		c = src[i];
+
+		int rc = (int)mbrtoc32(&mb, src+i, len - i, &state);
+		if (rc != 1) {
+			if (rc > 1) {
+				sz += (2*rc) + 4;
+			}
+			continue;
+		}
+
 		switch (c) {
 			case '&': sz += 5; break;
 			case '\'': sz += 6; break;
@@ -599,9 +611,25 @@ escape (char *dest, char *src, size_t len)
 	char c;
 	int i;
 	int j = 0;
+	char32_t mb;
+	char buf[13] = {0};
+	mbstate_t state = {0};
 
 	for (i = 0; i < len; i++) {
 		c = src[i];
+
+		int rc = (int)mbrtoc32(&mb, src+i, len - i, &state);
+		if (rc != 1) {
+			if (i - j > 0) dest = my_strcat(dest, src + j, i - j);
+			j = i + 1;
+
+			if (rc > 1) {
+				dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%x;", mb));
+			}
+
+			continue;
+		}
+
 		if ('&' == c || '<' == c || '>' == c || '\'' == c || '"' == c) {
 			if (i - j > 0) dest = my_strcat (dest, src + j, i - j);
 			j = i + 1;
