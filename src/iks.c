@@ -5,6 +5,8 @@
 */
 
 #include <uchar.h>
+#include <ctype.h>
+#include <stdbool.h>
 #include "common.h"
 #include "iksemel.h"
 
@@ -563,6 +565,11 @@ iks_has_attribs (iks *x)
 }
 
 /*****  Serializing  *****/
+static bool
+is_print(char c)
+{
+	return isprint(c) ||  c == '\t' || c == '\n' || c == '\r';
+}
 
 static size_t
 escape_size (char *src, size_t len)
@@ -582,6 +589,11 @@ escape_size (char *src, size_t len)
 			if (rc > 1) {
 				sz += (2*rc) + 4;
 			}
+			continue;
+		}
+
+		if (!is_print(c)) {
+			sz += 6;
 			continue;
 		}
 
@@ -627,6 +639,14 @@ escape (char *dest, char *src, size_t len)
 				dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%x;", mb));
 			}
 
+			continue;
+		}
+
+		if (!is_print(c)) {
+			if (i - j > 0) dest = my_strcat(dest, src + j, i - j);
+			j = i + 1;
+
+			dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%02x;", c));
 			continue;
 		}
 

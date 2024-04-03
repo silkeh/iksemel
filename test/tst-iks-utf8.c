@@ -18,6 +18,7 @@ int main (int argc, char *argv[])
 						"<emoji>&#x1f4a9;</emoji>"
 						"<invalid></invalid>"
 						"<null></null>"
+						"<nonprint>&#x01;&#x07;&#x0b;&#x7f;</nonprint>"
 						"</test>";
 
 	iks *x = iks_new ("test");
@@ -25,6 +26,7 @@ int main (int argc, char *argv[])
 	iks_insert_cdata (iks_insert (x, "emoji"), "\U0001F4A9", 4);
 	iks_insert_cdata (iks_insert (x, "invalid"), "\x80\x81", 2);
 	iks_insert_cdata (iks_insert (x, "null"), "\0", 1);
+	iks_insert_cdata (iks_insert (x, "nonprint"), "\x1\a\v\x7F", 4);
 
 	char *t = iks_string (iks_stack (x), x);
 	if(!t || strcmp(t, xml) != 0) {
