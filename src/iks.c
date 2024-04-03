@@ -632,7 +632,7 @@ iks_string (ikstack *s, iks *x)
 		if (s) {
 			return iks_stack_strdup (s, IKS_CDATA_CDATA (x), IKS_CDATA_LEN (x));
 		} else {
-			ret = iks_malloc (IKS_CDATA_LEN (x) + 1);
+			ret = iks_malloc (IKS_CDATA_LEN (x) + 1) ;
 			memcpy (ret, IKS_CDATA_CDATA (x), IKS_CDATA_LEN (x) + 1);
 			return ret;
 		}
