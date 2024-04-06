@@ -18,6 +18,10 @@ int main (int argc, char *argv[])
 						"<emoji>&#x1f4a9;</emoji>"
 						"<invalid></invalid>"
 						"<null></null>"
+						"<twoun>&#xc5;</twoun>"
+						"<threeun>&#x100;</threeun>"
+						"<katana>&#x30bb;</katana>"
+						"<wideunicode>&#x26007;</wideunicode>"
 						"<nonprint>&#x01;&#x07;&#x0b;&#x7f;</nonprint>"
 						"</test>";
 
@@ -26,8 +30,12 @@ int main (int argc, char *argv[])
 	iks_insert_cdata (iks_insert (x, "emoji"), "\U0001F4A9", 4);
 	iks_insert_cdata (iks_insert (x, "invalid"), "\x80\x81", 2);
 	iks_insert_cdata (iks_insert (x, "null"), "\0", 1);
+	iks_insert_cdata (iks_insert (x, "twoun"), "Å", 3);
+	iks_insert_cdata (iks_insert (x, "threeun"), "Ā", 3);
+	iks_insert_cdata (iks_insert (x, "katana"), "セ", 4);
+	iks_insert_cdata (iks_insert (x, "wideunicode"), "\U00026007", 4);
 	iks_insert_cdata (iks_insert (x, "nonprint"), "\x1\a\v\x7F", 4);
-
+	
 	char *t = iks_string (iks_stack (x), x);
 	if(!t || strcmp(t, xml) != 0) {
 		printf("Result:   %s\n", t);
