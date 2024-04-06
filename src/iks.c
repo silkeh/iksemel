@@ -4,6 +4,9 @@
 ** modify it under the terms of GNU Lesser General Public License.
 */
 
+#include <uchar.h>
+#include <ctype.h>
+#include <stdbool.h>
 #include "common.h"
 #include "iksemel.h"
 
@@ -562,6 +565,11 @@ iks_has_attribs (iks *x)
 }
 
 /*****  Serializing  *****/
+static bool
+is_print(char c)
+{
+	return isprint(c) ||  c == '\t' || c == '\n' || c == '\r';
+}
 
 static size_t
 escape_size (char *src, size_t len)
@@ -569,10 +577,26 @@ escape_size (char *src, size_t len)
 	size_t sz;
 	char c;
 	int i;
+	char32_t mb;
+	mbstate_t state = {0};
 
 	sz = 0;
 	for (i = 0; i < len; i++) {
 		c = src[i];
+
+		int rc = (int)mbrtoc32(&mb, src+i, len - i, &state);
+		if (rc != 1) {
+			if (rc > 1) {
+				sz += (2*rc) + 4;
+			}
+			continue;
+		}
+
+		if (!is_print(c)) {
+			sz += 6;
+			continue;
+		}
+
 		switch (c) {
 			case '&': sz += 5; break;
 			case '\'': sz += 6; break;
@@ -597,11 +621,37 @@ static char *
 escape (char *dest, char *src, size_t len)
 {
 	char c;
+
 	size_t i;
 	size_t j = 0;
 
+	char32_t mb;
+	char buf[13] = {0};
+	mbstate_t state = {0};
+
 	for (i = 0; i < len; i++) {
 		c = src[i];
+
+		int rc = (int)mbrtoc32(&mb, src+i, len - i, &state);
+		if (rc != 1) {
+			if (i - j > 0) dest = my_strcat(dest, src + j, i - j);
+			j = i + 1;
+
+			if (rc > 1) {
+				dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%x;", mb));
+			}
+
+			continue;
+		}
+
+		if (!is_print(c)) {
+			if (i - j > 0) dest = my_strcat(dest, src + j, i - j);
+			j = i + 1;
+
+			dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%02x;", c));
+			continue;
+		}
+
 		if ('&' == c || '<' == c || '>' == c || '\'' == c || '"' == c) {
 			if (i - j > 0) dest = my_strcat (dest, src + j, i - j);
 			j = i + 1;
