@@ -43,3 +43,8 @@ src/iksemel.egg-info/dependency_links.txt
 src/iksemel.egg-info/SOURCES.txt
 src/iksemel.egg-info/PKG-INFO
 src/iksemel.egg-info/top_level.txt
+
+*.patch
+
+# VSCode
+.vscode/

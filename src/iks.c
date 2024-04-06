@@ -597,8 +597,8 @@ static char *
 escape (char *dest, char *src, size_t len)
 {
 	char c;
-	int i;
-	int j = 0;
+	size_t i;
+	size_t j = 0;
 
 	for (i = 0; i < len; i++) {
 		c = src[i];

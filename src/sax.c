@@ -162,7 +162,7 @@ stack_expand (iksparser *prs, int len)
 	prs->stack_max = need;
 	prs->tag_name += diff;
 	if (prs->attflag != 0) {
-		int i = 0;
+		unsigned int i = 0;
 		while (i < (prs->attmax * 2)) {
 			if (prs->atts[i]) prs->atts[i] += diff;
 			i++;

@@ -70,7 +70,7 @@ pkgconf.set('VERSION', version)
 
 pkg_install_dir = '@0@/pkgconfig'.format(get_option('libdir'))
 
-configure_file(input : 'iksemel.pc.in'.format(version),
+configure_file(input : 'iksemel.pc.in',
   output : 'iksemel-@0@.pc'.format(version),
   configuration : pkgconf,
   install_dir : pkg_install_dir)

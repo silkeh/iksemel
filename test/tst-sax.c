@@ -152,7 +152,7 @@ tagHook (void *udata, char *name, char **atts, int type)
 
 	if (!tester.cur) TAG_FAIL;
 	if (tester.cur->type != IKS_TAG) TAG_FAIL;
-	if (tester.cur->tag != type) TAG_FAIL;
+	if ((int)tester.cur->tag != type) TAG_FAIL;
 	if (iks_strcmp (tester.cur->name, name) != 0) TAG_FAIL;
 	if (!atts && tester.cur->nr_atts > 0) TAG_FAIL;
 	if (atts && tester.cur->nr_atts == 0) TAG_FAIL;
@@ -177,7 +177,7 @@ tagHook (void *udata, char *name, char **atts, int type)
 void
 debug_cdata (char *data, size_t len, int pos)
 {
-	int i;
+	size_t i;
 
 	PRINT_TEST;
 	if (tester.cur && tester.cur->type == IKS_CDATA)

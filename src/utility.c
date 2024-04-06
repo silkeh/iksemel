@@ -100,7 +100,7 @@ char *
 iks_escape (ikstack *s, char *src, size_t len)
 {
 	char *ret;
-	int i, j, nlen;
+	size_t i, j, nlen;
 
 	if (!src || !s) return NULL;
 	if (len == -1) len = strlen (src);
@@ -138,7 +138,7 @@ iks_escape (ikstack *s, char *src, size_t len)
 char *
 iks_unescape (ikstack *s, char *src, size_t len)
 {
-	int i,j;
+	size_t i,j;
 	char *ret;
 
 	if (!s || !src) return NULL;
