@@ -83,7 +83,7 @@ if backends.length() != 0
 
   pkg_install_dir = '@0@/pkgconfig'.format(get_option('libdir'))
 
-  configure_file(input : 'jabber.pc.in'.format(version),
+  configure_file(input : 'jabber.pc.in',
     output : 'jabber-@0@.pc'.format(version),
     configuration : jabber_pkgconf,
     install_dir : pkg_install_dir)

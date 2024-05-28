@@ -6,6 +6,10 @@ iks_test = executable('test-iks', 'tst-iks.c',
                     include_directories : include_dir,
                     link_with : libiksemel)
 
+iks_test_utf8 = executable('test-iks-utf8', 'tst-iks-utf8.c',
+                           include_directories : include_dir,
+                           link_with : libiksemel)
+
 ikstack_test = executable('test-ikstack', 'tst-ikstack.c',
                     include_directories : include_dir,
                     link_with : libiksemel)
@@ -24,6 +28,7 @@ sha_test = executable('test-sha', 'tst-sha.c',
 
 test('Iksemel Test Suite - DOM Test', dom_test, is_parallel : true)
 test('Iksemel Test Suite - IKS Test', iks_test, is_parallel : true)
+test('Iksemel Test Suite - IKS UTF-8 Test', iks_test_utf8, is_parallel : true)
 test('Iksemel Test Suite - IkStack Test', ikstack_test, is_parallel : true)
 test('Iksemel Test Suite - MD5 Test', md5_test, is_parallel : true)
 test('Iksemel Test Suite - SAX Test', sax_test, is_parallel : true)

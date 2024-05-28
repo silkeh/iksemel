@@ -102,7 +102,7 @@ enum ikserror {
 };
 
 enum ikstagtype {
-	IKS_OPEN,
+	IKS_OPEN = 0,
 	IKS_CLOSE,
 	IKS_SINGLE
 };

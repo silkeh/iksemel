@@ -4,6 +4,8 @@
 ** modify it under the terms of GNU Lesser General Public License.
 */
 
+#include <ctype.h>
+#include <stdbool.h>
 #include "common.h"
 #include "iksemel.h"
 
@@ -562,6 +564,11 @@ iks_has_attribs (iks *x)
 }
 
 /*****  Serializing  *****/
+static bool
+is_print(char c)
+{
+	return isprint(c) ||  c == '\t' || c == '\n' || c == '\r';
+}
 
 static size_t
 escape_size (char *src, size_t len)
@@ -573,6 +580,43 @@ escape_size (char *src, size_t len)
 	sz = 0;
 	for (i = 0; i < len; i++) {
 		c = src[i];
+
+
+		if( c < 0 || c > 127 ){
+			
+			// Convert UTF-8 bytes to Unicode code point
+			unsigned char *ptr = (unsigned char *)(src+i);
+			
+			if( *ptr >= 0x80 &&  *ptr <= 0x9F ){
+				continue;
+			}
+			else if ((*ptr & 0xE8) == 0xC0) {
+				sz += 2 * 1 + 4;
+				i++;
+				continue;
+			}
+			else if ((*ptr &  0xF0) == 0xE0) {
+				sz += 2 * 3 + 4;
+				i+=2;
+				continue;
+			}
+			else if ((*ptr & 0xF8) == 0xF0) {
+				sz += 2 * 4 + 4;
+				i+=3;
+				continue;
+			}
+			else {
+			    sz += 6;
+			    continue;
+			}
+			
+		}
+
+		if (!is_print(c)) {
+			sz += 6;
+			continue;
+		}
+
 		switch (c) {
 			case '&': sz += 5; break;
 			case '\'': sz += 6; break;
@@ -597,11 +641,72 @@ static char *
 escape (char *dest, char *src, size_t len)
 {
 	char c;
-	int i;
-	int j = 0;
+
+	size_t i;
+	size_t j = 0;
+	
 
 	for (i = 0; i < len; i++) {
 		c = src[i];
+
+		// handle non-ascii characters
+		if (!is_print(c)) {
+		
+			if (i - j > 0) dest = my_strcat(dest, src + j, i - j);
+			j = i + 1;
+			
+			char buf[13] = {0};
+
+			if( c < 0 || c > 127){
+				// Convert UTF-8 bytes to Unicode code point
+
+				unsigned int unicode_code_point = 0;
+				unsigned char *ptr = (unsigned char *)(src+i);
+				
+				// Invalid characters
+				if( *ptr >= 0x80 &&  *ptr <= 0x9F ){
+					continue;
+				}
+				// 2 bytes
+				else if ((*ptr & 0xE8) == 0xC0) {
+					unicode_code_point = ((*ptr & 0x1F) << 6) | (*(ptr + 1) & 0x3F);
+					dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%02x;", unicode_code_point));
+					i++;
+					j = i + 1;
+					continue;
+				}
+				// 3 bytes
+				else if ((*ptr & 0xF0) == 0xE0) {
+					unicode_code_point = ((*ptr & 0x0F) << 12) | ((*(ptr + 1) & 0x3F) << 6) | (*(ptr + 2) & 0x3F);
+					dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%02x;", unicode_code_point));
+					i+=2;
+					j = i + 1;
+					continue;
+				}
+				// 4 bytes
+				else if ((*ptr & 0xF8) == 0xF0) {
+					unicode_code_point = ((*ptr & 0x07) << 18) | ((*(ptr + 1) & 0x3F) << 12) | ((*(ptr + 2) & 0x3F) << 6) | (*(ptr + 3) & 0x3F);
+					dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%02x;", unicode_code_point));
+					i+=3;
+					j = i + 1;
+					continue;
+				}
+				else {
+					dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%02x;", c));
+					continue;
+				}
+			
+			
+			}
+			else{
+				if(c != 0x00){
+					dest = my_strcat(dest, buf, snprintf(buf, sizeof buf, "&#x%02x;", c));
+					continue;
+				}
+			}
+		
+		}
+
 		if ('&' == c || '<' == c || '>' == c || '\'' == c || '"' == c) {
 			if (i - j > 0) dest = my_strcat (dest, src + j, i - j);
 			j = i + 1;
@@ -632,7 +737,7 @@ iks_string (ikstack *s, iks *x)
 		if (s) {
 			return iks_stack_strdup (s, IKS_CDATA_CDATA (x), IKS_CDATA_LEN (x));
 		} else {
-			ret = iks_malloc (IKS_CDATA_LEN (x) + 1);
+			ret = iks_malloc (IKS_CDATA_LEN (x) + 1) ;
 			memcpy (ret, IKS_CDATA_CDATA (x), IKS_CDATA_LEN (x) + 1);
 			return ret;
 		}
