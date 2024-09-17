@@ -31,17 +31,23 @@ document (char *xml)
 			break;
 		case IKS_NOMEM:
 			PR_TEST;
+			iks_parser_delete(p);
 			puts ("Not enough memory.");
 			exit (1);
 		case IKS_BADXML:
 			PR_TEST;
 			printf ("Invalid xml at byte %ld in\n[%s]\n", iks_nr_bytes (p), xml);
+			iks_parser_delete(p);
 			exit (1);
 		case IKS_HOOK:
 			PR_TEST;
 			puts ("Hook.");
 	}
 	iks_parser_delete (p);
+}
+
+void finalize() {
+	if (my_x) iks_delete(my_x);
 }
 
 void
@@ -140,8 +146,8 @@ string (char *xml)
 }
 
 static char buf[] =
-	"<presence id='JCOM_11' to='lala@j.org' type='available'><status>"
-	"&quot; &lt;online&amp;dangerous&gt; &quot;</status>meow<a><b c='d'/>"
+	"<presence id=\"JCOM_11\" to=\"lala@j.org\" type=\"available\"><status>"
+	"&quot; &lt;online&amp;dangerous&gt; &quot;</status>meow<a><b c=\"d\"/>"
 	"</a><test/></presence>";
 
 int main (int argc, char *argv[])
@@ -160,5 +166,6 @@ int main (int argc, char *argv[])
 	tag ("test", 0);
 	string (buf);
 
+	finalize();
 	return 0;
 }

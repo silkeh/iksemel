@@ -16,27 +16,32 @@ struct dom_data {
 static int
 tagHook (struct dom_data *data, char *name, char **atts, int type)
 {
-	iks *x;
+	iks* x;
 
 	if (IKS_OPEN == type || IKS_SINGLE == type) {
 		if (data->current) {
-			x = iks_insert (data->current, name);
-		} else {
-			ikstack *s;
-			s = iks_stack_new (data->chunk_size, data->chunk_size);
-			x = iks_new_within (name, s);
+			x = iks_insert(data->current, name);
+		}
+		else {
+			ikstack* s;
+			s = iks_stack_new(data->chunk_size, data->chunk_size);
+			x = iks_new_within(name, s);
+			if (!x) {
+				iks_stack_delete (s);
+				return IKS_NOMEM;
+			}
 		}
 		if (atts) {
-			int i=0;
+			int i = 0;
 			while (atts[i]) {
-				iks_insert_attrib (x, atts[i], atts[i+1]);
+				iks_insert_attrib(x, atts[i], atts[i + 1]);
 				i += 2;
 			}
 		}
 		data->current = x;
 	}
 	if (IKS_CLOSE == type || IKS_SINGLE == type) {
-		x = iks_parent (data->current);
+		x = iks_parent(data->current);
 		if (iks_strcmp(iks_name(data->current), name) != 0)
 			return IKS_BADXML;
 		if (x)
@@ -141,6 +146,7 @@ iks_load (const char *fname, iks **xptr)
 					int e;
 					e = iks_parse (prs, buf, len, done);
 					if (IKS_OK != e) {
+						iks_parser_delete (prs);
 						ret = e;
 						break;
 					}
